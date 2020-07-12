@@ -1,4 +1,5 @@
 const apiRouter = require("express").Router();
+require("dotenv").config();
 
 apiRouter.get("/", (req, res, next) => {
   res.send({
@@ -11,5 +12,9 @@ apiRouter.use("/code", codeRouter);
 
 const usersRouter = require("./users");
 apiRouter.use("/users", usersRouter);
+
+apiRouter.use((err, req, res, next) => {
+  res.send(err);
+});
 
 module.exports = apiRouter;

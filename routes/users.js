@@ -3,7 +3,7 @@ const usersRouter = apiRouter.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { createUser, getUserByUsername, getUser } = require("../db");
-const SALT_COUNT = 10;
+const saltRounds = 10;
 
 usersRouter.get("/", async (req, res, next) => {
   try {
@@ -32,7 +32,7 @@ usersRouter.post("/login", async (req, res, next) => {
         message: "Username or password is incorrect",
       });
     } else {
-      const token = jwt.sign(
+      const token = await jwt.sign(
         { id: user.id, username: user.username },
         process.env.JWT_SECRET,
         { expiresIn: "1w" }
@@ -47,23 +47,27 @@ usersRouter.post("/login", async (req, res, next) => {
 
 usersRouter.post("/register", async (req, res, next) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
+    console.log("req", req.body);
     const queriedUser = await getUserByUsername(username);
     if (queriedUser) {
       next({
         name: "UserExistsError",
         message: "A user by that username already exists",
+        email: "Please enter valid email",
       });
     } else if (password.length < 8) {
       next({
         name: "PasswordLengthError",
         message: "Password Too Short!",
+        email: "Please enter valid email",
       });
     } else {
-      bcrypt.hash(password, SALT_COUNT, async function (err, hashedPassword) {
+      bcrypt.hash(password, saltRounds, async function (err, hashedPassword) {
         const user = await createUser({
           username,
           password: hashedPassword,
+          email,
         });
         if (err) {
           next(err);

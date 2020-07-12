@@ -1,9 +1,6 @@
 // Connect to DB
 const { Client } = require("pg");
 const bcrypt = require("bcrypt");
-// const DB_URL = process.env.DATABASE_URL || `postgres://${DB_NAME}`;
-// const client = new Client(DB_URL);
-
 const client = new Client("postgres://localhost:5432/pumpcodes");
 
 async function createErrorCode({ errorcode, severity, meaning, solution }) {
@@ -29,10 +26,11 @@ async function getUser({ username, password }) {
   try {
     const user = await getUserByUsername(username);
     if (!user) return;
-    const matchingPassword = bcrypt.compareSync(password, user.password);
+    const matchingPassword = await bcrypt.compareSync(password, user.password);
     if (!matchingPassword) return;
     return user;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 }
@@ -129,6 +127,24 @@ async function createUser({ username, password, email }) {
   }
 }
 
+async function getUserByUsername(username) {
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT *
+      FROM users
+      WHERE username = $1;
+    `,
+      [username]
+    );
+    if (!rows || !rows.length) return null;
+    const [user] = rows;
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   client,
   getAllUsers,
@@ -138,4 +154,5 @@ module.exports = {
   createErrorCode,
   getAllCodes,
   getUser,
+  getUserByUsername,
 };

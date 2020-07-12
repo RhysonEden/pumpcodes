@@ -3,6 +3,7 @@ const SALT_COUNT = 10;
 const saltRounds = 10;
 const {
   client,
+  getUser,
   getAllUsers,
   createUser,
   updateUser,
@@ -58,63 +59,74 @@ async function rebuildDB() {
     client.connect();
     await dropTables();
     await createTables();
-    await testUsers();
-    // await createInitialUsers();
+    await createInitialUsers();
   } catch (error) {
     throw error;
-  }
-}
-
-async function testUsers() {
-  try {
-    console.log("testing");
-    bcrypt.hash("bertie99", saltRounds, async function (err, hash) {
-      const starter = await createUser({
-        username: "jgaleiphone",
-        password: hash,
-        email: "jgale@guardianfueltech.com",
-      });
-    });
-  } catch (error) {
-    console.log(error);
   }
 }
 
 async function createInitialUsers() {
   try {
     console.log("Starting to create users...");
-
-    // bcrypt.hash("bertie99", SALT_COUNT, async function (err, hashedPassword) {
-    //   const arman = await createUser({
-    //     username: "arman",
-    //     password: hashedPassword,
-    //     email: "test123",
-    //   });
-    //   console.log(arman);
-    // });
-    // bcrypt.hash("bertie99", SALT_COUNT, async function (err, hashedPassword) {
-    //   const james = await createUser({
-    //     username: "james",
-    //     password: hashedPassword,
-    //     email: "test123",
-    //   });
-    //   console.log(james);
-    // });
-    // bcrypt.hash("bertie99", SALT_COUNT, async function (err, hashedPassword) {
-    //   const robin = await createUser({
-    //     username: "robin",
-    //     password: hashedPassword,
-    //     email: "test123",
-    //   });
-    //   console.log(robin);
-    // });
-
-    console.log("Finished creating users!");
+    const hash1 = await bcrypt.hashSync("kaely09", saltRounds);
+    const hash2 = await bcrypt.hashSync("gft123", saltRounds);
+    const hash3 = await bcrypt.hashSync("gft2019", saltRounds);
+    const starter = await createUser({
+      username: "jgaleiphone",
+      password: hash1,
+      email: "jgale@guardianfueltech.com",
+    });
+    const starter2 = await createUser({
+      username: "dmcmichael",
+      password: hash2,
+      email: "dmcmichael@guardianfueltech.com",
+    });
+    const starter3 = await createUser({
+      username: "ddanke",
+      password: hash3,
+      email: "ddanke@guardianfueltech.com",
+    });
+    console.log(starter);
   } catch (error) {
-    console.error("Error creating users!");
-    throw error;
+    console.log(error);
   }
 }
+
+// async function createInitialUsers() {
+//   try {
+//     console.log("Starting to create users...");
+
+// bcrypt.hash("bertie99", SALT_COUNT, async function (err, hashedPassword) {
+//   const arman = await createUser({
+//     username: "arman",
+//     password: hashedPassword,
+//     email: "test123",
+//   });
+//   console.log(arman);
+// });
+// bcrypt.hash("bertie99", SALT_COUNT, async function (err, hashedPassword) {
+//   const james = await createUser({
+//     username: "james",
+//     password: hashedPassword,
+//     email: "test123",
+//   });
+//   console.log(james);
+// });
+// bcrypt.hash("bertie99", SALT_COUNT, async function (err, hashedPassword) {
+//   const robin = await createUser({
+//     username: "robin",
+//     password: hashedPassword,
+//     email: "test123",
+//   });
+//   console.log(robin);
+// });
+
+//     console.log("Finished creating users!");
+//   } catch (error) {
+//     console.error("Error creating users!");
+//     throw error;
+//   }
+// }
 
 async function testDB() {
   try {
